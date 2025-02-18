@@ -3,29 +3,39 @@ import Navbar from './components/Navbar.vue';
 import Balance from './components/Balance.vue';
 import TransactionList from './components/TransactionList.vue';
 import AddTransaction from './components/AddTransaction.vue';
-import type { Transaction } from './models/Transaction';
+import { getDtoFromTransaction, getTransactionFromDto, type Transaction, type TransactionDTO } from './models/Transaction';
 import { onMounted, ref } from 'vue';
 import { useToast } from 'vue-toastification';
+import axios from 'axios';
 
 const toast = useToast();
 
 const transactions = ref<Transaction[]>([]);
+const isLoading = ref(true);
 
-const onTransactionSubmit = (transaction: Transaction) => {
-  transactions.value.push(transaction);
-  localStorage.setItem('transactions', JSON.stringify(transactions.value));
+const initTransactions = async () => {
+  const response = await axios.get(`http://localhost:8000/transactions`);
+  const responseData = response.data as TransactionDTO[];
+  transactions.value = responseData.map(transaction => getTransactionFromDto(transaction));
+  isLoading.value = false;
+}
+
+const onTransactionSubmit = async (transaction: Transaction) => {
+  isLoading.value = true;
+  await axios.post(`http://localhost:8000/transactions`, getDtoFromTransaction(transaction));
   toast.success('Transaction added successfully.');
+  initTransactions();
 }
 
-const onTransactionDelete = (transactionId: string) => {
-  transactions.value = transactions.value.filter(transaction => transaction.id !== transactionId);
-  localStorage.setItem('transactions', JSON.stringify(transactions.value));
+const onTransactionDelete = async (transactionId: string) => {
+  isLoading.value = true;
+  await axios.delete(`http://localhost:8000/transactions/${transactionId}`);
   toast.info('Transaction deleted successfully.');
+  initTransactions();
 }
 
-onMounted(() => {
-  const data = localStorage.getItem('transactions');
-  transactions.value = data ? JSON.parse(data) : [];
+onMounted(async () => {
+  initTransactions();
 })
 
 </script>
@@ -34,7 +44,9 @@ onMounted(() => {
   <Navbar />
   <div class="container">
     <Balance :transactions="transactions" />
-    <TransactionList :transactions="transactions" @transactionDelete="onTransactionDelete($event)" />
+    <h3>History</h3>
+    <div v-if="isLoading">Loading...</div>
+    <TransactionList v-if="!isLoading" :transactions="transactions" @transactionDelete="onTransactionDelete($event)" />
     <AddTransaction @transactionSubmit="onTransactionSubmit($event)" />
   </div>
 </template>

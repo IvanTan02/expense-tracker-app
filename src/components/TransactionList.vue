@@ -19,7 +19,6 @@ const deleteTransaction = (transactionId?: string) => {
 </script>
 
 <template>
-  <h3>History</h3>
   <ul id="list" class="list">
     <li v-for="transaction in transactions" :key="transaction.id"
       :class="transaction.type === TRANSACTION_TYPE.EXPENSE ? 'minus' : 'plus'">
