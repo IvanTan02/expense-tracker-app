@@ -14,7 +14,7 @@ const transactions = ref<Transaction[]>([]);
 const isLoading = ref(true);
 
 const initTransactions = async () => {
-  const response = await axios.get(`http://localhost:8000/transactions`);
+  const response = await axios.get(`${import.meta.env.VITE_API_BASE_PATH}/transactions`);
   const responseData = response.data as TransactionDTO[];
   transactions.value = responseData.map(transaction => getTransactionFromDto(transaction));
   isLoading.value = false;
@@ -22,14 +22,14 @@ const initTransactions = async () => {
 
 const onTransactionSubmit = async (transaction: Transaction) => {
   isLoading.value = true;
-  await axios.post(`http://localhost:8000/transactions`, getDtoFromTransaction(transaction));
+  await axios.post(`${import.meta.env.VITE_API_BASE_PATH}/transactions`, getDtoFromTransaction(transaction));
   toast.success('Transaction added successfully.');
   initTransactions();
 }
 
 const onTransactionDelete = async (transactionId: string) => {
   isLoading.value = true;
-  await axios.delete(`http://localhost:8000/transactions/${transactionId}`);
+  await axios.delete(`${import.meta.env.VITE_API_BASE_PATH}/transactions/${transactionId}`);
   toast.info('Transaction deleted successfully.');
   initTransactions();
 }
