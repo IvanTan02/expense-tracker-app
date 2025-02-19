@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: night --default
+}
 
 :root {
   --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -9,7 +14,7 @@
 }
 
 body {
-  background-color: #f7f7f7;
+  background-color: var(--color-base-100);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -70,7 +75,7 @@ input[type='number'] {
   width: 100%;
 }
 
-.btn {
+/* .btn {
   cursor: pointer;
   background-color: #9c88ff;
   box-shadow: var(--box-shadow);
@@ -86,4 +91,4 @@ input[type='number'] {
 .btn:focus,
 .delete-btn:focus {
   outline: 0;
-}
+} */
