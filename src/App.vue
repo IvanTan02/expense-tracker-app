@@ -51,8 +51,10 @@ onMounted(async () => {
       <div class="flex flex-row justify-center">
         <moon-loader :loading="isLoading" size="40px"></moon-loader>
       </div>
-      <TransactionList v-if="!isLoading" :transactions="transactions"
-        @transactionDelete="onTransactionDelete($event)" />
+      <div style="max-height: 300px; overflow-y: auto;">
+        <TransactionList v-if="!isLoading" :transactions="transactions"
+          @transactionDelete="onTransactionDelete($event)" />
+      </div>
     </div>
   </section>
 </template>
