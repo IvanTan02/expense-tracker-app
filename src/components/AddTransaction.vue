@@ -5,8 +5,6 @@ import { reactive } from 'vue';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
-
-// const emit = defineEmits<Transaction>(['transactionSubmit']);
 const emit = defineEmits<{ (event: 'transactionSubmit', transaction: Transaction): void }>();
 
 const transactionForm = reactive<Transaction>({
@@ -27,22 +25,24 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <h3>Add New Transaction</h3>
-  <form id="form" @submit.prevent="onSubmit">
-    <div class="form-control">
-      <input type="radio" id="income" name="type" :value="TRANSACTION_TYPE.INCOME" v-model="transactionForm.type" />
-      <label for="income">Income</label>
-      <input type="radio" id="expense" name="type" :value="TRANSACTION_TYPE.EXPENSE" v-model="transactionForm.type" />
-      <label for="expense">Expense</label>
+  <h3 class="text-lg lg:text-2xl uppercase">Add Transaction</h3>
+  <form @submit.prevent="onSubmit">
+    <div class="tabs tabs-box tabs-md mb-5">
+      <input class="tab w-50" aria-label="Income" type="radio" id="income" name="type" :value="TRANSACTION_TYPE.INCOME"
+        v-model="transactionForm.type" />
+      <input class="tab w-50" aria-label="Expense" type="radio" id="expense" name="type"
+        :value="TRANSACTION_TYPE.EXPENSE" v-model="transactionForm.type" />
     </div>
-    <div class="form-control">
-      <label for="text">Text</label>
-      <input type="text" id="text" v-model="transactionForm.title" placeholder="Enter text..." />
+    <div class="flex flex-col">
+      <label class="floating-label mb-5">
+        <span>Title</span>
+        <input type="text" class="input input-lg w-100" v-model="transactionForm.title" />
+      </label>
+      <label class="floating-label mb-5">
+        <span>Amount</span>
+        <input type="number" class="input input-lg w-100" v-model="transactionForm.amount" />
+      </label>
+      <button class="btn btn-soft btn-primary">Add Transaction</button>
     </div>
-    <div class="form-control">
-      <label for="amount">Amount</label>
-      <input type="number" id="amount" v-model="transactionForm.amount" placeholder="Enter amount..." />
-    </div>
-    <button class="btn">Add transaction</button>
   </form>
 </template>

@@ -21,7 +21,7 @@ const deleteTransaction = (transactionId?: string) => {
 <template>
   <ul id="list" class="list">
     <li v-for="transaction in transactions" :key="transaction.id"
-      :class="transaction.type === TRANSACTION_TYPE.EXPENSE ? 'minus' : 'plus'">
+      :class="`border-2 border-transparent ${transaction.type === TRANSACTION_TYPE.EXPENSE ? 'border-r-red-400' : 'border-r-green-400'} mb-2 px-3 py-2 bg-neutral text-md lg:text-lg text-neutral-content`">
       {{ transaction.title }}
       <span>{{ transaction.type === TRANSACTION_TYPE.EXPENSE ? '-' : '+' }}RM{{ transaction.amount.toFixed(2) }}</span>
       <button @click="deleteTransaction(transaction.id || undefined)" class="delete-btn">x</button>
@@ -30,29 +30,11 @@ const deleteTransaction = (transactionId?: string) => {
 </template>
 
 <style scoped>
-.list {
-  list-style-type: none;
-  padding: 0;
-  margin-bottom: 40px;
-}
-
 .list li {
-  background-color: #fff;
   box-shadow: var(--box-shadow);
-  color: #333;
   display: flex;
   justify-content: space-between;
   position: relative;
-  padding: 10px;
-  margin: 10px 0;
-}
-
-.list li.plus {
-  border-right: 5px solid #2ecc71;
-}
-
-.list li.minus {
-  border-right: 5px solid #c0392b;
 }
 
 .delete-btn {

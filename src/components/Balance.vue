@@ -38,37 +38,32 @@ const expenses = computed(() => {
 </script>
 
 <template>
-  <h4>Your Balance</h4>
-  <h1 id="balance">RM{{ total.toFixed(2) }}</h1>
+  <div class="mt-4">
+    <h4 class="text-lg lg:text-2xl">Net Spend</h4>
+    <h4 :class="`text-xl lg:text-3xl ${total >= 0 ? 'text-green-400' : 'text-red-400'}`">RM{{ total.toFixed(2) }}</h4>
+  </div>
 
-  <div class="inc-exp-container">
-    <div>
-      <h4>Income</h4>
-      <p id="money-plus" class="money plus">+RM{{ income }}</p>
+  <div class="inc-exp-container mt-4 bg-neutral rounded-lg flex flex-col justify-evenly lg:flex-row shadow-lg">
+    <div class="text-center px-6 py-4" style="min-width: 200px">
+      <h4 class="text-neutral-content">Income</h4>
+      <p class="text-green-400">+RM{{ income }}</p>
     </div>
-    <div>
+    <div class="text-center px-6 py-4" style="min-width: 200px">
       <h4>Expense</h4>
-      <p id="money-minus" class="money minus">-RM{{ expenses }}</p>
+      <p class="text-red-400">-RM{{ expenses }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-.inc-exp-container {
-  background-color: #fff;
-  box-shadow: var(--box-shadow);
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 0;
-}
-
-.inc-exp-container>div {
-  flex: 1;
-  text-align: center;
-}
-
 .inc-exp-container>div:first-of-type {
-  border-right: 1px solid #dedede;
+  border-bottom: 1px solid var(--color-base-content);
+}
+
+@media (width >=64rem) {
+  .inc-exp-container>div:first-of-type {
+    border-right: 1px solid var(--color-base-content);
+    border-bottom: none;
+  }
 }
 </style>
