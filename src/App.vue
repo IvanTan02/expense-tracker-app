@@ -42,16 +42,19 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Navbar />
-  <div class="flex flex-col">
-    <Balance :transactions="transactions" />
-    <h3 class="text-lg lg:text-2xl uppercase">History</h3>
-    <div class="flex flex-row justify-center">
-      <moon-loader :loading="isLoading" size="40px"></moon-loader>
+  <section class="m-auto p-5" style="max-width: 800px;">
+    <Navbar />
+    <div class="flex flex-col">
+      <Balance :transactions="transactions" />
+      <AddTransaction @transactionSubmit="onTransactionSubmit($event)" />
+      <h3 class="mt-10 mb-2 pb-2 text-lg lg:text-2xl uppercase border-b-1 border-b-gray-500">History</h3>
+      <div class="flex flex-row justify-center">
+        <moon-loader :loading="isLoading" size="40px"></moon-loader>
+      </div>
+      <TransactionList v-if="!isLoading" :transactions="transactions"
+        @transactionDelete="onTransactionDelete($event)" />
     </div>
-    <TransactionList v-if="!isLoading" :transactions="transactions" @transactionDelete="onTransactionDelete($event)" />
-    <AddTransaction @transactionSubmit="onTransactionSubmit($event)" />
-  </div>
+  </section>
 </template>
 
 <style scoped></style>
