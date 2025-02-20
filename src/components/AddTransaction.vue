@@ -115,25 +115,31 @@ onMounted(async () => {
     }
   }
 
-  /* Active tab state */
+  /* Active tab style */
   :is(.tab-active, [aria-selected="true"], input:checked) {
-    background-color: color-mix(in oklab,
-        var(--color-secondary, var(--color-base-content)) 8%,
-        var(--color-base-100));
-    color: var(--color-secondary);
     font-weight: bold;
-
-    &:hover {
-      color: var(--color-secondary);
-    }
-
     box-shadow: 0 1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset,
-    0 1px 1px -1px color-mix(in oklab, var(--color-neutral) calc(var(--depth) * 50%), #0000),
-    0 1px 6px -4px color-mix(in oklab, var(--color-neutral) calc(var(--depth) * 100%), #0000);
+      0 1px 1px -1px color-mix(in oklab, var(--color-neutral) calc(var(--depth) * 50%), #0000),
+      0 1px 6px -4px color-mix(in oklab, var(--color-neutral) calc(var(--depth) * 100%), #0000);
 
     @media (forced-colors: active) {
       border: 1px solid;
     }
   }
+
+  :is(.tab-active, [aria-selected="true"], input:checked)[aria-label="Expense"] {
+    background-color: color-mix(in oklab,
+        var(--color-error, var(--color-base-content)) 8%,
+        var(--color-base-100));
+    color: var(--color-error);
+  }
+
+  :is(.tab-active, [aria-selected="true"], input:checked)[aria-label="Income"] {
+    background-color: color-mix(in oklab,
+        var(--color-success, var(--color-base-content)) 8%,
+        var(--color-base-100));
+    color: var(--color-success);
+  }
+
 }
 </style>
