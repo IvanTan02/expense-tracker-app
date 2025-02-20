@@ -48,23 +48,24 @@ onMounted(async () => {
   <form @submit.prevent="onSubmit">
     <div class="tabs tabs-box tabs-md mb-5">
       <input class="tab w-1/2" aria-label="Expense" type="radio" id="expense" name="type"
-        :value="TRANSACTION_TYPE.EXPENSE" v-model="transactionForm.type" />
+        :value="TRANSACTION_TYPE.EXPENSE" v-model="transactionForm.type" :disabled="isLoading" />
       <input class="tab w-1/2" aria-label="Income" type="radio" id="income" name="type" :value="TRANSACTION_TYPE.INCOME"
-        v-model="transactionForm.type" />
+        v-model="transactionForm.type" :disabled="isLoading" />
     </div>
     <div class="flex flex-col">
       <div class="grid grid-cols-1 lg:grid-cols-2">
         <div class="col-span-1 lg:pe-1 mb-2 lg:mb-5">
           <label class="input input-lg w-full">
             <span class="label"><i class="pi pi-pen-to-square text-neutral-content"></i></span>
-            <input type="text" v-model="transactionForm.title" placeholder="Enter your transaction" />
+            <input type="text" v-model="transactionForm.title" placeholder="Enter your transaction"
+              :disabled="isLoading" />
           </label>
         </div>
         <div class="col-span-1 lg:ps-1 mb-2 lg:mb-5">
           <label class="select select-lg w-full">
             <span class="label"><i class="pi pi-folder text-neutral-content"></i></span>
             <select v-model="transactionForm.category" :disabled="isLoading">
-              <option disabled selected value=''>{{ isLoading ? 'Loading...' : 'Select Category' }}</option>
+              <option disabled selected value=''>{{ isLoading ? 'Loading Categories...' : 'Select Category' }}</option>
               <option v-for="category in transactionCategory" :key="category" :value="category">{{ category }}
               </option>
             </select>
@@ -75,17 +76,17 @@ onMounted(async () => {
         <div class="col-span-1 lg:pe-1 mb-2 lg:mb-5">
           <label class="input input-lg w-full">
             <span class="label"><i class="pi pi-dollar text-neutral-content"></i></span>
-            <input type="number" v-model="transactionForm.amount" step=".01" />
+            <input type="number" v-model="transactionForm.amount" step=".01" :disabled="isLoading" />
           </label>
         </div>
         <div class="col-span-1 lg:ps-1 mb-2 lg:mb-5">
           <label class="input input-lg w-full">
             <span class="label"><i class="pi pi-calendar text-neutral-content"></i></span>
-            <input type="date" v-model="transactionForm.date" />
+            <input type="date" v-model="transactionForm.date" :disabled="isLoading" />
           </label>
         </div>
       </div>
-      <button class="btn btn-soft btn-primary">Add Transaction</button>
+      <button class="btn btn-soft btn-primary" :disabled="isLoading">Add Transaction</button>
     </div>
   </form>
 </template>

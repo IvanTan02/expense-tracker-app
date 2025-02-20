@@ -7,7 +7,7 @@ import { getDtoFromTransaction, getTransactionFromDto, type Transaction, type Tr
 import { onMounted, ref } from 'vue';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
-import MoonLoader from 'vue-spinner/src/MoonLoader.vue';
+import LoadingSpinner from './components/LoadingSpinner.vue';
 
 const toast = useToast();
 
@@ -44,18 +44,15 @@ onMounted(async () => {
 <template>
   <section class="m-auto p-5" style="max-width: 800px;">
     <Navbar />
-    <div class="flex flex-col">
+    <div class="flex flex-col" v-if="!isLoading">
       <Balance :transactions="transactions" />
       <AddTransaction @transactionSubmit="onTransactionSubmit($event)" />
       <h3 class="mt-10 mb-2 pb-2 text-lg lg:text-2xl uppercase border-b-1 border-b-gray-500">History</h3>
-      <div class="flex flex-row justify-center">
-        <moon-loader :loading="isLoading" size="40px"></moon-loader>
-      </div>
       <div style="max-height: 300px; overflow-y: auto;">
-        <TransactionList v-if="!isLoading" :transactions="transactions"
-          @transactionDelete="onTransactionDelete($event)" />
+        <TransactionList :transactions="transactions" @transactionDelete="onTransactionDelete($event)" />
       </div>
     </div>
+    <LoadingSpinner v-if="isLoading" />
   </section>
 </template>
 
