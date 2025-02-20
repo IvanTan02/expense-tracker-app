@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { defineProps, type PropType } from 'vue';
+import { ref, defineProps, type PropType } from 'vue';
 import type { Transaction } from '@/models/Transaction';
 import { TRANSACTION_TYPE } from '@/enums';
+import Modal from './Modal.vue';
 
 defineProps({
   transactions: {
@@ -12,9 +13,25 @@ defineProps({
 
 const emit = defineEmits<{ (event: 'transactionDelete', transactionId: string): void }>();
 
+// Track the transaction ID that will be edited/deleted
+const selectedTransactionId = ref<string | null>(null);
+
 const deleteTransaction = (transactionId?: string) => {
   if (transactionId) emit('transactionDelete', transactionId);
+  closeDeleteConfirmation();
 }
+
+const dialog = ref<InstanceType<typeof Modal>>();
+
+const showDeleteConfirmation = (transcationId: string) => {
+  selectedTransactionId.value = transcationId;
+  dialog.value?.show()
+};
+
+const closeDeleteConfirmation = () => {
+  selectedTransactionId.value = null;
+  dialog.value?.close()
+};
 
 </script>
 
@@ -25,9 +42,17 @@ const deleteTransaction = (transactionId?: string) => {
       {{ transaction.title }}
       <div>
         <span>{{ transaction.type === TRANSACTION_TYPE.EXPENSE ? '-' : '+' }}RM{{ transaction.amount.toFixed(2) }}</span>
-        <button class="btn btn-soft btn-error ms-4 p-4" @click="deleteTransaction(transaction.id || undefined)"><i
+        <button class="btn btn-soft btn-error ms-4 p-4" @click="showDeleteConfirmation(transaction.id!)"><i
             class="pi pi-times text-neutral-content text-xs"></i></button>
       </div>
     </li>
   </ul>
+  <Modal ref="dialog">
+    <h3 class="text-lg font-bold">Delete Transaction</h3>
+    <p class="py-4">Are you sure you want to delete this transaction?</p>
+    <div class="flex flex-row justify-end">
+      <button class="btn me-2" @click="closeDeleteConfirmation">Cancel</button>
+      <button class="btn btn-soft btn-error" @click="deleteTransaction(selectedTransactionId!)">Confirm</button>
+    </div>
+  </Modal>
 </template>
