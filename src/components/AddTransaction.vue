@@ -1,27 +1,46 @@
 <script setup lang="ts">
 import { TRANSACTION_TYPE } from '@/enums';
 import type { Transaction } from '@/models/Transaction';
-import { reactive } from 'vue';
+import { reactive, onMounted, ref } from 'vue';
 import { useToast } from 'vue-toastification';
+import axios from 'axios';
+import { DateTime } from "luxon";
 
 const toast = useToast();
 const emit = defineEmits<{ (event: 'transactionSubmit', transaction: Transaction): void }>();
 
-const transactionForm = reactive<Transaction>({
+const transactionForm = reactive({
   title: '',
   type: TRANSACTION_TYPE.EXPENSE,
   amount: 0,
+  category: '',
+  date: DateTime.now().toFormat('yyyy-MM-dd'),
 });
 
+const transactionCategory = ref([]);
+const isLoading = ref(true);
+
 const onSubmit = () => {
-  if (!transactionForm.title || !transactionForm.amount) {
+  if (!transactionForm.title || !transactionForm.amount || !transactionForm.category) {
     toast.error('Fields are invalid');
     return;
   }
-  emit('transactionSubmit', { ...transactionForm, amount: Number(transactionForm.amount.toFixed(2)), id: Math.floor(Math.random() * 100000).toString() });
+  emit('transactionSubmit', { ...transactionForm, amount: Number(transactionForm.amount.toFixed(2)) });
+  resetForm();
+}
+
+const resetForm = () => {
   transactionForm.title = '';
   transactionForm.amount = 0;
+  transactionForm.category = '';
 }
+
+onMounted(async () => {
+  const response = await axios.get(`${import.meta.env.VITE_API_BASE_PATH}/transactions/categories`);
+  transactionCategory.value = response.data;
+  isLoading.value = false;
+})
+
 </script>
 
 <template>
@@ -34,16 +53,37 @@ const onSubmit = () => {
         v-model="transactionForm.type" />
     </div>
     <div class="flex flex-col">
-      <label class="input input-lg mb-5 w-full">
-        <span class="label"><i class="pi pi-pen-to-square text-neutral-content"></i></span>
-        <input type="text" v-model="transactionForm.title" placeholder="Enter your transaction" />
-      </label>
-      <div>
-        <label class="input validator input-lg w-full">
-          <span class="label"><i class="pi pi-dollar text-neutral-content"></i></span>
-          <input type="number" v-model="transactionForm.amount" step=".01" />
-        </label>
-        <div class="validator-hint">Max two decimal places</div>
+      <div class="grid grid-cols-1 lg:grid-cols-2">
+        <div class="col-span-1 lg:pe-1 mb-2 lg:mb-5">
+          <label class="input input-lg w-full">
+            <span class="label"><i class="pi pi-pen-to-square text-neutral-content"></i></span>
+            <input type="text" v-model="transactionForm.title" placeholder="Enter your transaction" />
+          </label>
+        </div>
+        <div class="col-span-1 lg:ps-1 mb-2 lg:mb-5">
+          <label class="select select-lg w-full">
+            <span class="label"><i class="pi pi-folder text-neutral-content"></i></span>
+            <select v-model="transactionForm.category" :disabled="isLoading">
+              <option disabled selected value=''>{{ isLoading ? 'Loading...' : 'Select Category' }}</option>
+              <option v-for="category in transactionCategory" :key="category" :value="category">{{ category }}
+              </option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2">
+        <div class="col-span-1 lg:pe-1 mb-2 lg:mb-5">
+          <label class="input input-lg w-full">
+            <span class="label"><i class="pi pi-dollar text-neutral-content"></i></span>
+            <input type="number" v-model="transactionForm.amount" step=".01" />
+          </label>
+        </div>
+        <div class="col-span-1 lg:ps-1 mb-2 lg:mb-5">
+          <label class="input input-lg w-full">
+            <span class="label"><i class="pi pi-calendar text-neutral-content"></i></span>
+            <input type="date" v-model="transactionForm.date" />
+          </label>
+        </div>
       </div>
       <button class="btn btn-soft btn-primary">Add Transaction</button>
     </div>

@@ -5,6 +5,8 @@ export interface TransactionDTO {
   title: string;
   type: TRANSACTION_TYPE;
   amount: number;
+  category: string;
+  date: string;
 }
 
 export interface Transaction {
@@ -12,6 +14,8 @@ export interface Transaction {
   title: string;
   type: TRANSACTION_TYPE;
   amount: number;
+  category: string;
+  date: string;
 }
 
 export function getTransactionFromDto(dto: TransactionDTO): Transaction {
@@ -20,6 +24,8 @@ export function getTransactionFromDto(dto: TransactionDTO): Transaction {
     title: dto.title,
     type: dto.type,
     amount: dto.amount,
+    category: dto.category,
+    date: dto.date,
   };
 }
 
@@ -28,5 +34,7 @@ export function getDtoFromTransaction(transaction: Transaction): TransactionDTO 
     title: transaction.title,
     type: transaction.type,
     amount: transaction.amount,
+    category: transaction.category,
+    date: transaction.date,
   };
 }
