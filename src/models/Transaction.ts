@@ -1,4 +1,5 @@
 import type { TRANSACTION_TYPE } from "@/enums";
+import { DateTime } from "luxon";
 
 export interface TransactionDTO {
   _id?: string;
@@ -25,12 +26,13 @@ export function getTransactionFromDto(dto: TransactionDTO): Transaction {
     type: dto.type,
     amount: dto.amount,
     category: dto.category,
-    date: dto.date,
+    date: DateTime.fromISO(dto.date).toFormat('yyyy-MM-dd'),
   };
 }
 
 export function getDtoFromTransaction(transaction: Transaction): TransactionDTO {
   return {
+    _id: transaction.id,
     title: transaction.title,
     type: transaction.type,
     amount: transaction.amount,

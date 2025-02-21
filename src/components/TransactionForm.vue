@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import { TRANSACTION_TYPE } from '@/enums';
 import type { Transaction } from '@/models/Transaction';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref, defineProps, type PropType } from 'vue';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
 import { DateTime } from "luxon";
 
+const props = defineProps({
+  transaction: {
+    type: Object as PropType<Transaction>,
+  },
+  editMode: {
+    type: Boolean,
+    default: false,
+  }
+})
+
 const toast = useToast();
-const emit = defineEmits<{ (event: 'transactionSubmit', transaction: Transaction): void }>();
+const emit = defineEmits<{
+  (event: 'transactionSubmit', transaction: Transaction): void;
+  (event: 'cancel'): void;
+}>();
 
 const transactionForm = reactive({
   title: '',
@@ -20,12 +33,31 @@ const transactionForm = reactive({
 const transactionCategory = ref([]);
 const isLoading = ref(true);
 
+const initFormValues = () => {
+  if (!props.transaction) return;
+  transactionForm.title = props.transaction.title;
+  transactionForm.type = props.transaction.type;
+  transactionForm.amount = props.transaction.amount;
+  transactionForm.category = props.transaction.category;
+  transactionForm.date = props.transaction.date;
+}
+
 const onSubmit = () => {
   if (!transactionForm.title || !transactionForm.amount || !transactionForm.category) {
     toast.error('Fields are invalid');
     return;
   }
-  emit('transactionSubmit', { ...transactionForm, amount: Number(transactionForm.amount.toFixed(2)) });
+  const transaction: Transaction = {
+    ...transactionForm,
+    amount: Number(transactionForm.amount.toFixed(2))
+  };
+  if (props.editMode) transaction.id = props.transaction?.id;
+  emit('transactionSubmit', transaction);
+  resetForm();
+}
+
+const onCancel = () => {
+  emit('cancel');
   resetForm();
 }
 
@@ -38,13 +70,13 @@ const resetForm = () => {
 onMounted(async () => {
   const response = await axios.get(`${import.meta.env.VITE_API_BASE_PATH}/transactions/categories`);
   transactionCategory.value = response.data;
+  initFormValues();
   isLoading.value = false;
 })
 
 </script>
 
 <template>
-  <h3 class="mt-10 mb-2 pb-2 text-lg lg:text-2xl uppercase border-b-1 border-b-gray-500">Add Transaction</h3>
   <form @submit.prevent="onSubmit">
     <div class="tabs tabs-box tabs-md mb-5">
       <input class="tab w-1/2" aria-label="Expense" type="radio" id="expense" name="type"
@@ -86,7 +118,12 @@ onMounted(async () => {
           </label>
         </div>
       </div>
-      <button class="btn btn-soft btn-primary" :disabled="isLoading">Add Transaction</button>
+      <div class="flex flex-row justify-end">
+        <button v-if="editMode" type="button" class="btn btn-soft btn-base me-1 grow" @click="onCancel"
+          :disabled="isLoading">Cancel</button>
+        <button class="btn btn-soft btn-primary ms-1 grow" type="submit"
+          :disabled="isLoading">{{ editMode ? 'Save' : 'Add' }} Transaction</button>
+      </div>
     </div>
   </form>
 </template>

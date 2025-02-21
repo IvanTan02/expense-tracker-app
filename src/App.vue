@@ -2,7 +2,7 @@
 import Navbar from './components/Navbar.vue';
 import Balance from './components/Balance.vue';
 import TransactionList from './components/TransactionList.vue';
-import AddTransaction from './components/AddTransaction.vue';
+import TransactionForm from './components/TransactionForm.vue';
 import { getDtoFromTransaction, getTransactionFromDto, type Transaction, type TransactionDTO } from './models/Transaction';
 import { onMounted, ref } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -15,6 +15,7 @@ const transactions = ref<Transaction[]>([]);
 const isLoading = ref(true);
 
 const initTransactions = async () => {
+  isLoading.value = true;
   const response = await axios.get(`${import.meta.env.VITE_API_BASE_PATH}/transactions`);
   const responseData = response.data as TransactionDTO[];
   transactions.value = responseData.map(transaction => getTransactionFromDto(transaction));
@@ -22,17 +23,18 @@ const initTransactions = async () => {
 }
 
 const onTransactionSubmit = async (transaction: Transaction) => {
-  isLoading.value = true;
-  await axios.post(`${import.meta.env.VITE_API_BASE_PATH}/transactions`, getDtoFromTransaction(transaction));
-  toast.success('Transaction added successfully.');
-  initTransactions();
-}
-
-const onTransactionDelete = async (transactionId: string) => {
-  isLoading.value = true;
-  await axios.delete(`${import.meta.env.VITE_API_BASE_PATH}/transactions/${transactionId}`);
-  toast.info('Transaction deleted successfully.');
-  initTransactions();
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_PATH}/transactions`, getDtoFromTransaction(transaction));
+    if (response.status === 200) {
+      toast.success('Transaction added successfully.');
+      initTransactions();
+    } else {
+      toast.error('Error adding transaction.');
+    }
+  } catch (error) {
+    toast.error('Error adding transaction.');
+    console.error(error);
+  }
 }
 
 onMounted(async () => {
@@ -46,10 +48,11 @@ onMounted(async () => {
     <Navbar />
     <div class="flex flex-col" v-if="!isLoading">
       <Balance :transactions="transactions" />
-      <AddTransaction @transactionSubmit="onTransactionSubmit($event)" />
+      <h3 class="mt-10 mb-2 pb-2 text-lg lg:text-2xl uppercase border-b-1 border-b-gray-500">Add Transaction</h3>
+      <TransactionForm @transactionSubmit="onTransactionSubmit($event)" />
       <h3 class="mt-10 mb-2 pb-2 text-lg lg:text-2xl uppercase border-b-1 border-b-gray-500">History</h3>
       <div style="max-height: 300px; overflow-y: auto;">
-        <TransactionList :transactions="transactions" @transactionDelete="onTransactionDelete($event)" />
+        <TransactionList :transactions="transactions" @transactionsUpdated="() => { initTransactions() }" />
       </div>
     </div>
     <LoadingSpinner v-if="isLoading" />
